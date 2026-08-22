@@ -1,0 +1,14 @@
+@Configuration
+public class FinanceTools {
+
+    @Bean
+    @Description("Registra uma nova transação financeira de receita ou despesa")
+    public Function<Request, String> criarTransacao(TransacaoRepository repository) {
+        return req -> {
+            Transacao t = repository.salvar(req.descricao(), req.valor(), req.tipo());
+            return "Transação registrada com sucesso: ID " + t.id();
+        };
+    }
+
+    public record Request(String descricao, Double valor, String tipo) {}
+}
