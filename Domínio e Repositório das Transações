@@ -1,0 +1,16 @@
+public record Transacao(Long id, String descricao, Double valor, String tipo) {}
+
+@Repository
+public class TransacaoRepository {
+    private final List<Transacao> banco = new ArrayList<>();
+
+    public Transacao salvar(String descricao, Double valor, String tipo) {
+        Transacao t = new Transacao((long) (banco.size() + 1), descricao, valor, tipo);
+        banco.add(t);
+        return t;
+    }
+
+    public List<Transacao> listar() {
+        return banco;
+    }
+}
