@@ -1,0 +1,28 @@
+@RestController
+@RequestMapping("/api/orcamento")
+public class VoiceBudgetController {
+
+    private final OpenAiAudioTranscriptionModel transcriptionModel;
+    private final ChatClient chatClient;
+
+    public VoiceBudgetController(OpenAiAudioTranscriptionModel transcriptionModel, ChatClient.Builder chatBuilder) {
+        this.transcriptionModel = transcriptionModel;
+        this.chatClient = chatBuilder.build();
+    }
+
+    @PostMapping("/audio")
+    public String processarAudio(@RequestParam("file") MultipartFile audioFile) {
+        // 1. Transcrever áudio para texto
+        var transcriptionResponse = transcriptionModel.call(
+            new AudioTranscriptionPrompt(audioFile.getResource())
+        );
+        String textoTranscrito = transcriptionResponse.getResult().getOutput();
+
+        // 2 e 3. Processar intenção via IA e acionar a Tool
+        return chatClient.prompt()
+            .user(textoTranscrito)
+            .functions("criarTransacao")
+            .call()
+            .content();
+    }
+}
